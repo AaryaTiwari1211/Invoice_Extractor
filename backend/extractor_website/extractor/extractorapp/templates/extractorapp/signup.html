@@ -1,0 +1,134 @@
+<!-- signup.html -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Signup</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+
+      button[type="submit"] {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-transform: uppercase;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #45a049;
+      }
+
+      p {
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      p a {
+        text-decoration: none;
+        color: #666;
+      }
+      .messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+    
+      .message {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+    
+      /* Success Message */
+      .message.success {
+        background-color: #dff0d8;
+        color: #3c763d;
+      }
+    
+      /* Error Message */
+      .message.error {
+        background-color: #f2dede;
+        color: #a94442;
+      }
+    
+      /* Info Message */
+      .message.info {
+        background-color: #d9edf7;
+        color: #31708f;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Sign up</h1>
+      <form method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username">GSTIN:</label>
+          <input type="text" id="username" name="gstin" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit">Sign up</button>
+      </form>
+
+      <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  </body>
+</html>

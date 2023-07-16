@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF Upload</title>
+</head>
+<body>
+    <h1>PDF Upload</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="pdf_file" accept="application/pdf">
+        <button type="submit">Upload</button>
+    </form>
+    <br>
+    <a href="{% url 'file_download' %}" target="_blank">Download File</a>
+</body>
+</html>
