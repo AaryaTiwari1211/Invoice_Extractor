@@ -46,7 +46,6 @@ class User(AbstractBaseUser,PermissionsMixin):
 
 class PDFDocument(models.Model):
     name = models.CharField(max_length=255)
-    pdf_file = models.FileField(upload_to='pdf_documents/')
-
+    pdf_file = models.FileField(upload_to='pdf_files/')
     def __str__(self):
-        return self.name
+        return self.name1

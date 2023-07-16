@@ -1,4 +1,5 @@
 from .models import PDFDocument
+from django.http import HttpResponse, FileResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.contrib import messages
@@ -67,7 +68,7 @@ def file_upload(request):
             pdf_document.name = pdf_file.name
             pdf_document.pdf_file.save(
                 pdf_file.name, output_file)
-            return redirect('file_download', document_name=pdf_document.name)
+            return redirect('file_download', document_name=pdf_file.name)
     else:
         form = PDFUploadForm()
     return render(request, 'extractorapp/file_upload.html', {'form': form})

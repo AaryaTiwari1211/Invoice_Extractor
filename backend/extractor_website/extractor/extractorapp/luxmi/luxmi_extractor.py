@@ -2,7 +2,6 @@ import re
 import PyPDF2
 from .luxmi_qr_code_gen import luxmi_qr_code_generator
 
-
 # def extract_text_from_luxmi_pdf(file):
 #     # Wrap the PDF file with io.TextIOWrapper and specify the encoding and error handling
 #     with io.TextIOWrapper(file, encoding='latin-1', errors='replace') as pdf_file:
