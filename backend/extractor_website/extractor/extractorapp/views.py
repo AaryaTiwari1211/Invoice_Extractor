@@ -10,14 +10,10 @@ from .forms import PDFUploadForm
 from django.contrib.auth.decorators import login_required
 from .luxmi.luxmi_qr_code_gen import luxmi_qr_code_generator
 from .luxmi.luxmi_extractor import extract_text_from_luxmi_pdf, luxmi_invoice_data, luxmi_material_info
-from .rockman.rockman_extractor import extract_text_from_rockman_pdf, rockman_invoice_data
-from .rockman.rockman_qrcode import rockman_qr_code_generator
-from io import TextIOWrapper, BytesIO
 User = get_user_model()
-
+import random
 # Disabling CSRF protection for simplicity (not recommended in production)
 # @csrf_exempt
-
 
 def login_view(request):
     if request.method == 'POST':
@@ -33,6 +29,14 @@ def login_view(request):
     else:
         return render(request, 'extractorapp/login.html')
 
+def random_id(length):
+    number = '0123456789'
+    alpha = 'abcdefghijklmnopqrstuvwxyz'
+    id = ''
+    for i in range(0,length,2):
+        id += random.choice(number)
+        id += random.choice(alpha)
+    return id
 
 def signup_view(request):
     if request.method == 'POST':
@@ -51,7 +55,6 @@ def signup_view(request):
 
     return render(request, 'extractorapp/signup.html')
 
-
 @login_required(login_url='login')
 def file_upload(request):
     if request.method == 'POST':
@@ -60,13 +63,15 @@ def file_upload(request):
             # gstin = request.user.gstin
             pdf_file = request.FILES['pdf_file']
             extracted_text = extract_text_from_luxmi_pdf(pdf_file)
+            print(extracted_text)
             materials = luxmi_material_info(extracted_text)
             invoice_data = luxmi_invoice_data(extracted_text, materials)
+            print(invoice_data)
             output_file = luxmi_qr_code_generator(invoice_data, pdf_file)
             pdf_document = PDFDocument()
-            pdf_document.name = pdf_file.name
+            pdf_document.name = pdf_file.name[:-4] + random_id(6) + ".pdf"
             pdf_document.pdf_file.save(
-                pdf_file.name, output_file)
+                pdf_document.name, output_file)
             return redirect('file_download', document_name=pdf_document.name)
     else:
         form = PDFUploadForm()
@@ -82,7 +87,7 @@ def file_download(request, document_name):
         if pdf_document:
             # Create a response with the PDF file
             response = HttpResponse(
-                pdf_document.pdf_file.path, content_type='application/pdf')
+                pdf_document.pdf_file, content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="{document_name}"'
             return response
         else:

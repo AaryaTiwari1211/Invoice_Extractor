@@ -18,6 +18,8 @@ def luxmi_qr_code_generator(qr_text, pdf_file):
             qrtxt = '{0}\n{1}'.format(qrtxt, v)
         else:
             qrtxt = '{0}'.format(v)
+    print("qrtxt:", qrtxt)
+    print("invno:", invno)
 
     # Generate QR code
     url = pyqrcode.create(qrtxt)

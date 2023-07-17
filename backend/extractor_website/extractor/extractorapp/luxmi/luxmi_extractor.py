@@ -1,8 +1,11 @@
 import re
 import PyPDF2
+import io
+import chardet
 from .luxmi_qr_code_gen import luxmi_qr_code_generator
 
 
+# File Function
 # def extract_text_from_luxmi_pdf(file):
 #     # Wrap the PDF file with io.TextIOWrapper and specify the encoding and error handling
 #     with io.TextIOWrapper(file, encoding='latin-1', errors='replace') as pdf_file:
@@ -13,7 +16,7 @@ from .luxmi_qr_code_gen import luxmi_qr_code_generator
 #     print(text)
 #     return text
 
-
+# File Path Function
 # def extract_text_from_luxmi_pdf(file):
 #     # Wrap the PDF file with io.TextIOWrapper to specify the encoding and error handling
 #     reader = PyPDF2.PdfReader(file)
@@ -22,8 +25,9 @@ from .luxmi_qr_code_gen import luxmi_qr_code_generator
 #         text += page.extract_text()
 #     print(text)
 #     return text
-import io
-import chardet
+
+
+# File Function with chardet to detect encoding
 
 
 def extract_text_from_luxmi_pdf(file):
@@ -91,9 +95,17 @@ def luxmi_invoice_data(text, materials):
 
     driver_name = ""
     vehicle_type = ""
-    transporter_name = ""
+    
+    transport_pattern = r"Transport\s*:\s*([\w\s]+)"
+    transport_match = re.search(transport_pattern, text)
+    if transport_match:
+        transport = transport_match.group(1)
+        index = transport.find("PO DATE")
+        transport = transport[:index].strip()
+    else :
+        transport = ""
 
-    formatted_text = f"{po_no}|{invoice_no}|{invoice_date}|{vehicle_no}|{driver_name}|{vehicle_type}|{transporter_name}|"
+    formatted_text = f"{po_no}|{invoice_no}|{invoice_date}|{vehicle_no}|{driver_name}|{vehicle_type}|{transport}|"
     material_info = ""
     for material in materials:
         material_info += f"{material['code']}|{material['qty']}|{batch_no}|{manuf_date}|{expiry_date}|"
@@ -103,6 +115,8 @@ def luxmi_invoice_data(text, materials):
     print("Invoice No:", invoice_no)
     print("Buyer GSTIN: ", buyer_gst)
     print("Supplier GSTIN: ", supplier_gst)
+    print("Transport: ", transport)
+    print("Vehicle No: ", vehicle_no)
     print("\n")
 
     return formatted_text + material_info
@@ -117,26 +131,33 @@ def luxmi_material_info(text):
     material_section = text[start_index:end_index].strip()
 
     lines = material_section.split("\n")
+    codes = []
+    quantities = []
 
     for line in lines[2:]:
-        material_pattern = r"\((P.NO.\d{5}-\d{3}-\d{4})\)|\((\d{5}-[A-Z]{3}-\d{4})\)"
+        material_pattern = r"\d{10}"
+        quantity_pattern = r"(\d+)X(\d+)"
         material_code_match = re.search(material_pattern, line)
         print(material_code_match)
-        quantity_match = re.search(r"(\d+)X(\d+)", line)
-
-        if material_code_match and quantity_match:
-            material_code = material_code_match.group(
-                1) or material_code_match.group(2)
+        quantity_match = re.search(quantity_pattern, line)
+        if material_code_match:
+            material_code = material_code_match.group() 
+            print(material_code)
+            codes.append(material_code)
+        if quantity_match:
             quantity = int(quantity_match.group(1)) * \
                 int(quantity_match.group(2))
-            material_info.append({
-                "code": material_code,
-                "qty": quantity
-            })
+            print(quantity)
+            quantities.append(quantity)
+    # print(codes, quantities)
 
-    for material in material_info:
-        print("Material Code:", material['code'])
-        print("Quantity:", material['qty'])
-        print()
+    for i in range(len(codes)):
+        material_info.append({
+            'code': codes[i],
+            'qty': quantities[i]
+        })
 
     return material_info
+
+
+
