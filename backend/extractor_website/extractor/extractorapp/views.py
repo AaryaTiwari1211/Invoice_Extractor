@@ -82,7 +82,7 @@ def file_download(request, document_name):
         if pdf_document:
             # Create a response with the PDF file
             response = HttpResponse(
-                pdf_document.pdf_file, content_type='application/pdf')
+                pdf_document.pdf_file.path, content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="{document_name}"'
             return response
         else:
