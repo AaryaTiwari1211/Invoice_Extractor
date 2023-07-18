@@ -2,7 +2,7 @@ import re
 import PyPDF2
 import io
 import chardet
-from .luxmi_qr_code_gen import luxmi_qr_code_generator
+# from luxmi_qr_code_gen import luxmi_qr_code_generator
 
 
 # File Function
@@ -18,7 +18,6 @@ from .luxmi_qr_code_gen import luxmi_qr_code_generator
 
 # File Path Function
 # def extract_text_from_luxmi_pdf(file):
-#     # Wrap the PDF file with io.TextIOWrapper to specify the encoding and error handling
 #     reader = PyPDF2.PdfReader(file)
 #     text = ''
 #     for page in reader.pages:
@@ -131,12 +130,14 @@ def luxmi_material_info(text):
     material_section = text[start_index:end_index].strip()
 
     lines = material_section.split("\n")
+    print(lines)
     codes = []
     quantities = []
 
     for line in lines[2:]:
         material_pattern = r"\d{10}"
-        quantity_pattern = r"(\d+)X(\d+)"
+        quantity_pattern =  r"(\d{1,3}(?:,\d{3})*)(?:\.\d+)?\s*Pcs\."
+
         material_code_match = re.search(material_pattern, line)
         print(material_code_match)
         quantity_match = re.search(quantity_pattern, line)
@@ -145,10 +146,10 @@ def luxmi_material_info(text):
             print(material_code)
             codes.append(material_code)
         if quantity_match:
-            quantity = int(quantity_match.group(1)) * \
-                int(quantity_match.group(2))
+            quantity = quantity_match.group(1)
+            quantity = quantity.replace(",", "")
             print(quantity)
-            quantities.append(quantity)
+            quantities.append(int(quantity))
     # print(codes, quantities)
 
     for i in range(len(codes)):
@@ -157,7 +158,4 @@ def luxmi_material_info(text):
             'qty': quantities[i]
         })
 
-    return material_info
-
-
-
+    return material_info 
